@@ -20,3 +20,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 route ::get('/kelas', 'App\Http\Controllers\KelasController@getDataKelas');
 route ::get('/kelas/{idkelas}', 'App\Http\Controllers\KelasController@getDataKelasById');
+route ::post('/insertkelas', 'App\Http\Controllers\KelasController@insertDataKelas');
+route ::post('/insertguru', 'App\Http\Controllers\KelasController@insertDataGuru');
+route ::put('/updateguru', 'App\Http\Controllers\KelasController@updateDataGuru');
+route ::delete('/deleteguru', 'App\Http\Controllers\KelasController@deleteDataGuru');
+route ::delete('/deleteguruparam', 'App\Http\Controllers\KelasController@deleteDataGuruParam');
+route ::get('/guru', 'App\Http\Controllers\KelasController@getDataGuru');
