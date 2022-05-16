@@ -36,7 +36,29 @@ class KelasController extends Controller
         }
 
     }
-    public function insertDataKelas (request $request){
+
+    public function getDataKelasById($idkelas){
+        // $ambildata = DB::table('kelas')->first(); --> first(cmn nampilin yg pertama)
+         $ambildata = DB::table('kelas')
+         ->where('id_kelas',$idkelas)
+         ->get();
+         if($ambildata){
+          //   return response()->json(["Results"->
+          //           ["ResultCode"->1, 
+          //           ["ResultMessage"->"Sukses Login"], 
+         //            "DataUser"->$ambildata
+         //   ],200
+         //);
+         return response()->json($ambildata, 200);
+         }else {
+             return response()->json(["Result"=>
+             ["ResultCode"=>0,
+             "ResultMassege"=>"User atau password salah"]], 401
+             );
+         }
+ 
+     }
+     public function insertDataKelas (request $request){
         // DB::table('kelas')->insert([
         //     'kelas' => $request->input('kelas'),
         //     'jurusan' => $request->input('jurusan'),
@@ -61,27 +83,7 @@ class KelasController extends Controller
                ],200
            );
        }
-    public function getDataKelasById($idkelas){
-        // $ambildata = DB::table('kelas')->first(); --> first(cmn nampilin yg pertama)
-         $ambildata = DB::table('kelas')
-         ->where('id_kelas',$idkelas)
-         ->get();
-         if($ambildata){
-          //   return response()->json(["Results"->
-          //           ["ResultCode"->1, 
-          //           ["ResultMessage"->"Sukses Login"], 
-         //            "DataUser"->$ambildata
-         //   ],200
-         //);
-         return response()->json($ambildata, 200);
-         }else {
-             return response()->json(["Result"=>
-             ["ResultCode"=>0,
-             "ResultMassege"=>"User atau password salah"]], 401
-             );
-         }
- 
-     }
+
      public function insertDataGuru(Request $request){
          DB::table('guru')->insert([
              'rfid' => $request->input('rfid'),
@@ -149,8 +151,69 @@ class KelasController extends Controller
          }
  
      }
+     public function getDataGuruKelas(){
+        // $age = array("Peter"=>35, "Ben"=>37, "Joe"=>43);
+        // $cars = array("Volvo", "BMW", "Yaris"=>"Toyota", "Honda"); //ada key yang lain json akan menyesuaikan
+        // $jsoncars = json_encode($cars); 
+        // $jsonage = json_encode($age);
+        // // print_r($cars);//ada indexnya
+        // // print_r($jsoncars); //lagsg di valuenya 
+        // $jsonobj = '{ "Peter":35, "Ben": 37, "Joe":43}';
+        // //print_r(json_decode($jsonobj)); //jadi kelas objek of array/tdk bisa diakses 
+        // //print_r(json_decode($jsonobj, true)); //jadi array 
+        // $obj = json_decode($jsonobj);
+        // $arr = json_decode($jsonobj, true);
+        // print_r($obj); //objek dibungkus array
+        // print_r($arr);
+        // print_r($arr["Peter"]); //default array dari atribut
+        // print_r($obj->Peter); //keluarannya key pada atribut tersebut 
+        // exit;
+
+        // print_r($arr_result); //hasil sudah jd array tdk std objk
+        // //dd($ambildataGuruKelas);
+        // // foreach($ambildataGuruKelas as $key => $value){
+        // //     print_r($value->id_guru);
+        // //     print_r('--------');
+        // // }
+        // exit;
+        
+        //---------------------AMBIL DATA DARI DATABASE
+        $ambildataGuru = DB::table('guru')->get();
+        $ambildataGuruKelas = DB::table('guru')
+                                ->join('jadwal_guru', 'guru.id_guru', '=', 'jadwal_guru.id_guru')
+                                ->join('kelas', 'jadwal_guru.id_kelas', '=', 'kelas.id_kelas')
+                                ->select('guru.id_guru', 'jadwal_guru.hari', 'jadwal_guru.jam_mulai', 'kelas.kelas', 'kelas.jurusan', 'kelas.sub')
+                                ->get();
+        //---------------------KONVERSI HASIL DB MENJADI ARRAY UNTUK DIOLAH KEYNYA
+        $arr_result = json_decode($ambildataGuru, true);
+        //---------------------PENGOLAHAN STRUKTUR ARRAY
+        foreach($arr_result as $keyguru => $valueguru){
+            foreach($ambildataGuruKelas as $key => $value){
+                if($valueguru['id_guru'] == $value->id_guru)
+                {
+                    $arr_jadwal = array("hari"=>$value->hari,
+                                        "kelas"=>$value->kelas." ".$value->jurusan." ".$value->sub, 
+                                        "jam_mulai"=>$value->jam_mulai,
+                                        "id_guru"=>$value->id_guru);
+                    $arr_result[$keyguru]['jadwal_guru'][] = $arr_jadwal;
+                }  
+            }
+        }
+        //---------------------KEMBALIKAN KE API-------------
+        if($arr_result ){
+           return response()->json(["User"=> "Stefani",
+                                   "Waktu Akses"=> today(),
+                                   "result" => 1,
+                                   "DataGuru"=> $arr_result], 250);
+           }else {
+               return response()->json(["Result"=>
+               ["ResultCode"=>0,
+               "ResultMassege"=>"Data Tidak Ditemukan"]], 401
+               );
+           } 
+}
      public function deleteDataGuru(request $request){
-         dd($request->input('id_guru'));
+        dd($request->input('id_guru'));
          DB::table('guru')->where('id_guru', $request->input('id_guru'))->delete();
          
          return response()->json(
@@ -163,7 +226,8 @@ class KelasController extends Controller
            );
      }
      public function deleteDataGuruParam($id){
-        DB::table('guru')->where('id_guru', $request->input('id_guru'))->delete();
+        dd($id);
+        DB::table('guru')->where('id_guru', $id)->delete();
         return response()->json(
            ["Result"=>
               [

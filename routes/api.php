@@ -24,5 +24,6 @@ route ::post('/insertkelas', 'App\Http\Controllers\KelasController@insertDataKel
 route ::post('/insertguru', 'App\Http\Controllers\KelasController@insertDataGuru');
 route ::put('/updateguru', 'App\Http\Controllers\KelasController@updateDataGuru');
 route ::delete('/deleteguru', 'App\Http\Controllers\KelasController@deleteDataGuru');
-route ::delete('/deleteguruparam', 'App\Http\Controllers\KelasController@deleteDataGuruParam');
+route ::delete('/deleteguruparam/{id}', 'App\Http\Controllers\KelasController@deleteDataGuruParam');
 route ::get('/guru', 'App\Http\Controllers\KelasController@getDataGuru');
+route ::get('/gurukelas', 'App\Http\Controllers\KelasController@getDataGuruKelas');
