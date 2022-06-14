@@ -100,7 +100,7 @@ class HarianController extends Controller
  
      }
 
-     public function deleteDataMapel(request $request){
+     public function deleteDataHarian(request $request){
         dd($request->input('id_presensi_harian'));
          DB::table('presensi_harian')->where('id_presensi_harian', $request->input('id_presensi_harian'))->delete();
          
@@ -114,7 +114,7 @@ class HarianController extends Controller
            );
      }
      
-     public function deleteDataMapelParam($id){
+     public function deleteDataHarianParam($id){
         dd($id);
         DB::table('presensi_harian')->where('id_presensi_harian', $id)->delete();
         return response()->json(
